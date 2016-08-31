@@ -9,7 +9,7 @@ TMChat is a simple chat-demonstration using the Tendermint-Blockchain as a means
 
 
 ## How to run
-This project is handled by [Maven](https://maven.apache.org/) and thus can be build as such. (You will need to maven installed)
+This project is handled by [Maven](https://maven.apache.org/) and thus can be build as such. (You will need to have maven installed)
 
     git clone https://github.com/wolfposd/TMChat.git
     cd TMChat
