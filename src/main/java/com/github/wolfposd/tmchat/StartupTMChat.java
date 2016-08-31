@@ -31,16 +31,26 @@ public class StartupTMChat {
 
         NodeCommunication nc = new NodeCommunication();
 
-        Frontend f1 = new Frontend("Left", nc);
-        f1.setLocation(100, 100);
-        Frontend f2 = new Frontend("Middle", nc);
-        f2.setLocation(100+600, 100);
-        Frontend f3 = new Frontend("Right", nc);
-        f3.setLocation(100+1200, 100);
+        if (args.length > 0) {
+            for (int i = 0; i < args.length; i++) {
+                String arg = args[i];
+                Frontend f = new Frontend(arg, nc);
+                nc.registerFrontend(arg, f);
+                f.setLocation(50 + 200 * i, 100);
+            }
+        } else {
+            Frontend f1 = new Frontend("Left", nc);
+            f1.setLocation(100, 100);
+            Frontend f2 = new Frontend("Middle", nc);
+            f2.setLocation(100 + 600, 100);
+            Frontend f3 = new Frontend("Right", nc);
+            f3.setLocation(100 + 1200, 100);
 
-        nc.registerFrontend("Left", f1);
-        nc.registerFrontend("Middle", f2);
-        nc.registerFrontend("Right", f3);
+            nc.registerFrontend("Left", f1);
+            nc.registerFrontend("Middle", f2);
+            nc.registerFrontend("Right", f3);
+        }
+
     }
 
     public static void sleep(long ms) {

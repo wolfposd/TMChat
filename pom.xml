@@ -6,6 +6,13 @@
 	<groupId>com.github.wolfposd</groupId>
 	<artifactId>TMChat</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	
+	<repositories>
+		<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
@@ -18,6 +25,38 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+		        <configuration>
+		          <archive>
+		            <manifest>
+		              <addClasspath>true</addClasspath>
+		              <mainClass>com.github.wolfposd.tmchat.StartupTMChat</mainClass>
+		            </manifest>
+		          </archive>
+		        </configuration>
+		      </plugin>
+		      <plugin>
+				  <groupId>org.apache.maven.plugins</groupId>
+				  <artifactId>maven-shade-plugin</artifactId>
+				  <version>2.3</version>
+				  <executions>
+				    <execution>
+				      <phase>package</phase>
+				      <goals>
+				        <goal>shade</goal>
+				      </goals>
+				      <configuration>
+				        <minimizeJar>true</minimizeJar>
+				        <createDependencyReducedPom>true</createDependencyReducedPom>
+				        <dependencyReducedPomLocation>
+				          ${java.io.tmpdir}/dependency-reduced-pom.xml
+				        </dependencyReducedPomLocation>
+				      </configuration>
+				    </execution>
+				  </executions>
+				</plugin>
 		</plugins>
 	</build>
 
@@ -29,17 +68,17 @@
 			<version>2.7</version>
 		</dependency>
 		
-		<!-- Local Dependencies -->
+		<!-- Github Dependencies via jitpack.io -->
 		<dependency>
-			<groupId>com.github.jtmsp</groupId>
+			<groupId>com.github.jTMSP</groupId>
 			<artifactId>jTMSP</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.jtmsp</groupId>
-			<artifactId>TendermintWebsocket</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+		    <groupId>com.github.jTMSP</groupId>
+		    <artifactId>websocket</artifactId>
+		    <version>-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
