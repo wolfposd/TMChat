@@ -23,12 +23,13 @@
  */
 package com.github.wolfposd.tmchat;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.websocket.CloseReason;
 
 import com.github.jtmsp.api.IAppendTx;
 import com.github.jtmsp.api.ICheckTx;
@@ -42,17 +43,17 @@ import com.github.jtmsp.types.Types.ResponseAppendTx;
 import com.github.jtmsp.types.Types.ResponseCheckTx;
 import com.github.jtmsp.types.Types.ResponseCommit;
 import com.github.jtmsp.websocket.ByteUtil;
-import com.github.jtmsp.websocket.TMWSClient;
-import com.github.jtmsp.websocket.TMWSClient.WSListener;
+import com.github.jtmsp.websocket.Websocket;
+import com.github.jtmsp.websocket.WebsocketStatus;
 import com.github.jtmsp.websocket.jsonrpc.JSONRPC;
 import com.github.wolfposd.tmchat.frontend.FrontendListener;
 import com.github.wolfposd.tmchat.frontend.ISendMessage;
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 
-public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, WSListener, ISendMessage {
+public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, ISendMessage, WebsocketStatus {
 
-    private TMWSClient wsClient;
+    private Websocket wsClient;
     private TSocket socket;
 
     private Gson gson = new Gson();
@@ -62,6 +63,7 @@ public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, WSListen
 
     public NodeCommunication() {
 
+        wsClient = new Websocket(this);
         socket = new TSocket();
         socket.registerListener(this);
         new Thread(socket::start).start();
@@ -73,14 +75,8 @@ public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, WSListen
     }
 
     private void reconnectWS() {
-        try {
-            wsClient = new TMWSClient("http://localhost:46657/websocket");
-            wsClient.addListener(this);
-            wsClient.connectBlocking();
-            System.out.println("Websocket connected");
-        } catch (URISyntaxException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        wsClient.reconnectWebsocket();
+        System.out.println("Websocket connected");
     }
 
     public void registerFrontend(String username, FrontendListener f) {
@@ -114,23 +110,17 @@ public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, WSListen
     @Override
     public void sendMessage(Message m) {
         JSONRPC rpc = JSONRPC.broadcastTXSync(gson.toJson(m));
-        wsClient.send(rpc, e -> {
+        wsClient.sendMessage(rpc, e -> {
             // no interest
             });
     }
 
     @Override
-    public void onPingSent() {
-        JSONRPC rpc = JSONRPC.blockHeight(1);
-        wsClient.send(rpc, cb -> {
-            // no interest
-            });
-    }
-
-    @Override
-    public void onClose(int code, String codeName, String reason, boolean remote) {
-        System.out.println("Websocket closed... reconnecting");
-        reconnectWS();
+    public void wasClosed(CloseReason cr) {
+        if (!"Manual Close".equals(cr.getReasonPhrase())) {
+            System.out.println("Websocket closed... reconnecting");
+            reconnectWS();
+        }
     }
 
 }

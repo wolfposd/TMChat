@@ -78,7 +78,7 @@
 		<dependency>
 		    <groupId>com.github.jTMSP</groupId>
 		    <artifactId>websocket</artifactId>
-		    <version>-SNAPSHOT</version>
+		    <version>d825a20682</version>
 		</dependency>
 	</dependencies>
 </project>
