@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>com.github.jTMSP</groupId>
 			<artifactId>jTMSP</artifactId>
-			<version>-SNAPSHOT</version>
+			<version>228d368</version> <!--  228d368  is the v0.8 tag -->
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
