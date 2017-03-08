@@ -44,4 +44,9 @@ public class Message {
         timestamp = System.currentTimeMillis();
     }
 
+    @Override
+    public String toString() {
+        return "Message [sender=" + sender + ", receiver=" + receiver + ", message=" + message + ", timestamp=" + timestamp + "]";
+    }
+
 }

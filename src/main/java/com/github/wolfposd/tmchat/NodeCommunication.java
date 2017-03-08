@@ -31,27 +31,29 @@ import java.util.concurrent.TimeUnit;
 
 import javax.websocket.CloseReason;
 
-import com.github.jtmsp.api.IAppendTx;
-import com.github.jtmsp.api.ICheckTx;
-import com.github.jtmsp.api.ICommit;
-import com.github.jtmsp.socket.TSocket;
-import com.github.jtmsp.types.Types.CodeType;
-import com.github.jtmsp.types.Types.RequestAppendTx;
-import com.github.jtmsp.types.Types.RequestCheckTx;
-import com.github.jtmsp.types.Types.RequestCommit;
-import com.github.jtmsp.types.Types.ResponseAppendTx;
-import com.github.jtmsp.types.Types.ResponseCheckTx;
-import com.github.jtmsp.types.Types.ResponseCommit;
+import com.github.jtendermint.jabci.api.ICheckTx;
+import com.github.jtendermint.jabci.api.ICommit;
+import com.github.jtendermint.jabci.api.IDeliverTx;
+import com.github.jtendermint.jabci.socket.TSocket;
+import com.github.jtendermint.jabci.types.Types.CodeType;
+import com.github.jtendermint.jabci.types.Types.RequestCheckTx;
+import com.github.jtendermint.jabci.types.Types.RequestCommit;
+import com.github.jtendermint.jabci.types.Types.RequestDeliverTx;
+import com.github.jtendermint.jabci.types.Types.ResponseCheckTx;
+import com.github.jtendermint.jabci.types.Types.ResponseCommit;
+import com.github.jtendermint.jabci.types.Types.ResponseDeliverTx;
 import com.github.jtmsp.websocket.ByteUtil;
 import com.github.jtmsp.websocket.Websocket;
 import com.github.jtmsp.websocket.WebsocketStatus;
 import com.github.jtmsp.websocket.jsonrpc.JSONRPC;
+import com.github.jtmsp.websocket.jsonrpc.Method;
+import com.github.jtmsp.websocket.jsonrpc.calls.StringParam;
 import com.github.wolfposd.tmchat.frontend.FrontendListener;
 import com.github.wolfposd.tmchat.frontend.ISendMessage;
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 
-public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, ISendMessage, WebsocketStatus {
+public class NodeCommunication implements ICheckTx, IDeliverTx, ICommit, ISendMessage, WebsocketStatus {
 
     private Websocket wsClient;
     private TSocket socket;
@@ -69,14 +71,14 @@ public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, ISendMes
         new Thread(socket::start).start();
         System.out.println("Started TMSP Socket");
 
-        // wait 5 seconds before connecting the websocket
+        // wait 10 seconds before connecting the websocket
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-        executorService.schedule(() -> reconnectWS(), 5, TimeUnit.SECONDS);
+        executorService.schedule(() -> reconnectWS(), 10, TimeUnit.SECONDS);
     }
 
     private void reconnectWS() {
+        System.out.println("Trying to connect to Websocket...");
         wsClient.reconnectWebsocket();
-        System.out.println("Websocket connected");
     }
 
     public void registerFrontend(String username, FrontendListener f) {
@@ -84,16 +86,18 @@ public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, ISendMes
     }
 
     @Override
-    public ResponseAppendTx receivedAppendTx(RequestAppendTx req) {
+    public ResponseDeliverTx receivedDeliverTx(RequestDeliverTx req) {
 
         Message msg = gson.fromJson(new String(req.getTx().toByteArray()), Message.class);
+
+        System.out.println(msg);
 
         FrontendListener l = frontends.get(msg.receiver);
         if (l != null) {
             l.messageIncoming(msg);
         }
 
-        return ResponseAppendTx.newBuilder().setCode(CodeType.OK).build();
+        return ResponseDeliverTx.newBuilder().setCode(CodeType.OK).build();
     }
 
     @Override
@@ -109,10 +113,10 @@ public class NodeCommunication implements ICheckTx, IAppendTx, ICommit, ISendMes
 
     @Override
     public void sendMessage(Message m) {
-        JSONRPC rpc = JSONRPC.broadcastTXSync(gson.toJson(m));
+        JSONRPC rpc = new StringParam(Method.BROADCAST_TX_ASYNC, gson.toJson(m).getBytes());
         wsClient.sendMessage(rpc, e -> {
             // no interest
-            });
+        });
     }
 
     @Override

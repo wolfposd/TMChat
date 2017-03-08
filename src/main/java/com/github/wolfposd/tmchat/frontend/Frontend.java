@@ -62,7 +62,7 @@ public class Frontend implements FrontendListener {
     private void setupUI() {
         frame = new JFrame(user);
 
-        recipient = new JTextField(5);
+        recipient = new JTextField(12);
         chatlog = new JTextArea();
         chatmessage = new JTextField(15);
         sendButton = new JButton("Send");

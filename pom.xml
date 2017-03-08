@@ -70,15 +70,14 @@
 		
 		<!-- Github Dependencies via jitpack.io -->
 		<dependency>
-			<groupId>com.github.jTMSP</groupId>
-			<artifactId>jTMSP</artifactId>
-			<version>228d368</version> <!--  228d368  is the v0.8 tag -->
-			<scope>compile</scope>
+		    <groupId>com.github.jTendermint</groupId>
+		    <artifactId>jabci</artifactId>
+		    <version>-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.jTMSP</groupId>
+		    <groupId>com.github.jTendermint</groupId>
 		    <artifactId>websocket</artifactId>
-		    <version>d825a20682</version>
+		    <version>-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
