@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.websocket.CloseReason;
 
+import com.github.jtendermint.crypto.ByteUtil;
 import com.github.jtendermint.jabci.api.ICheckTx;
 import com.github.jtendermint.jabci.api.ICommit;
 import com.github.jtendermint.jabci.api.IDeliverTx;
@@ -42,8 +43,8 @@ import com.github.jtendermint.jabci.types.Types.RequestDeliverTx;
 import com.github.jtendermint.jabci.types.Types.ResponseCheckTx;
 import com.github.jtendermint.jabci.types.Types.ResponseCommit;
 import com.github.jtendermint.jabci.types.Types.ResponseDeliverTx;
-import com.github.jtmsp.websocket.ByteUtil;
 import com.github.jtmsp.websocket.Websocket;
+import com.github.jtmsp.websocket.WebsocketException;
 import com.github.jtmsp.websocket.WebsocketStatus;
 import com.github.jtmsp.websocket.jsonrpc.JSONRPC;
 import com.github.jtmsp.websocket.jsonrpc.Method;
@@ -71,14 +72,20 @@ public class NodeCommunication implements ICheckTx, IDeliverTx, ICommit, ISendMe
         new Thread(socket::start).start();
         System.out.println("Started TMSP Socket");
 
-        // wait 10 seconds before connecting the websocket
+        // wait 3 seconds before connecting the websocket
+        System.out.println("waiting 3 seconds before connecting to Websocket...");
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-        executorService.schedule(() -> reconnectWS(), 10, TimeUnit.SECONDS);
+        executorService.schedule(() -> reconnectWS(), 3, TimeUnit.SECONDS);
     }
 
     private void reconnectWS() {
         System.out.println("Trying to connect to Websocket...");
-        wsClient.reconnectWebsocket();
+        try {
+            wsClient.connect();
+            System.out.println("connected");
+        } catch (WebsocketException e) {
+            e.printStackTrace();
+        }
     }
 
     public void registerFrontend(String username, FrontendListener f) {
@@ -87,10 +94,9 @@ public class NodeCommunication implements ICheckTx, IDeliverTx, ICommit, ISendMe
 
     @Override
     public ResponseDeliverTx receivedDeliverTx(RequestDeliverTx req) {
-
-        Message msg = gson.fromJson(new String(req.getTx().toByteArray()), Message.class);
-
-        System.out.println(msg);
+        
+        byte[] byteArray = req.getTx().toByteArray();
+        Message msg = gson.fromJson(new String(byteArray), Message.class);
 
         FrontendListener l = frontends.get(msg.receiver);
         if (l != null) {
