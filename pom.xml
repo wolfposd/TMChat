@@ -6,11 +6,11 @@
 	<groupId>com.github.wolfposd</groupId>
 	<artifactId>TMChat</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	
+
 	<repositories>
 		<repository>
-	    <id>jitpack.io</id>
-	    <url>https://jitpack.io</url>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
 
@@ -26,37 +26,66 @@
 				</configuration>
 			</plugin>
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-jar-plugin</artifactId>
-		        <configuration>
-		          <archive>
-		            <manifest>
-		              <addClasspath>true</addClasspath>
-		              <mainClass>com.github.wolfposd.tmchat.StartupTMChat</mainClass>
-		            </manifest>
-		          </archive>
-		        </configuration>
-		      </plugin>
-		      <plugin>
-				  <groupId>org.apache.maven.plugins</groupId>
-				  <artifactId>maven-shade-plugin</artifactId>
-				  <version>2.3</version>
-				  <executions>
-				    <execution>
-				      <phase>package</phase>
-				      <goals>
-				        <goal>shade</goal>
-				      </goals>
-				      <configuration>
-				        <minimizeJar>true</minimizeJar>
-				        <createDependencyReducedPom>true</createDependencyReducedPom>
-				        <dependencyReducedPomLocation>
-				          ${java.io.tmpdir}/dependency-reduced-pom.xml
-				        </dependencyReducedPomLocation>
-				      </configuration>
-				    </execution>
-				  </executions>
-				</plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>com.github.wolfposd.tmchat.StartupTMChat</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.bouncycastle</groupId>
+									<artifactId>bcprov-jdk15on</artifactId>
+									<version>1.57</version>
+									<type>jar</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<excludes>org.bouncycastle:*:*:*</excludes>
+								<excludes>junit:*:*:*</excludes>
+							</artifactSet>
+							<minimizeJar>true</minimizeJar>
+							<createDependencyReducedPom>true</createDependencyReducedPom>
+							<dependencyReducedPomLocation>
+								${java.io.tmpdir}/dependency-reduced-pom.xml
+							</dependencyReducedPomLocation>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
