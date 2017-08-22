@@ -67,17 +67,16 @@
 			<artifactId>gson</artifactId>
 			<version>2.7</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.github.jtendermint</groupId>
+			<artifactId>jabci</artifactId>
+			<version>0.10.0</version>
+		</dependency>
 		<!-- Github Dependencies via jitpack.io -->
 		<dependency>
-		    <groupId>com.github.jTendermint</groupId>
-		    <artifactId>jabci</artifactId>
-		    <version>-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.github.jTendermint</groupId>
-		    <artifactId>websocket</artifactId>
-		    <version>-SNAPSHOT</version>
+			<groupId>com.github.jTendermint</groupId>
+			<artifactId>websocket</artifactId>
+			<version>-0.0.2-beta-g5ead0d3-3</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -72,10 +72,10 @@ public class NodeCommunication implements ICheckTx, IDeliverTx, ICommit, ISendMe
         new Thread(socket::start).start();
         System.out.println("Started TMSP Socket");
 
-        // wait 3 seconds before connecting the websocket
-        System.out.println("waiting 3 seconds before connecting to Websocket...");
+        // wait 5 seconds before connecting the websocket
+        System.out.println("waiting 5 seconds before connecting to Websocket...");
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-        executorService.schedule(() -> reconnectWS(), 3, TimeUnit.SECONDS);
+        executorService.schedule(() -> reconnectWS(), 5, TimeUnit.SECONDS);
     }
 
     private void reconnectWS() {
