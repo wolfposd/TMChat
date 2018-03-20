@@ -29,10 +29,12 @@ You will then find a runnable JAR in the target-directory, start it as follows:
     
 ## Introduction
 
-This demo is meant to be a very easy to understand application for tendermint.
+This demo is meant as a simple introduction on how to write applications for tendermint.
 
 ![architecture](https://github.com/wolfposd/TMChat/raw/master/screenshots/architecture.png "architecture")
 
-The project is seperated into two parts. We have the NodeCommunication, which connects to the tendermint-node via TMSP to handle all the Tendermint messages like AppendTX, CheckTx and Commit. It also connects via Websocket to the tendermint-node to broadcast TXs it received from its connected clients.
+The Components are seperated into two logical parts, each serving a different functionality.
+
+The NodeCommunication class connects to the tendermint-node via the ABCI-Socket Protocol (using jabci) to handle all the Tendermint messages like AppendTX, CheckTx and Commit. It also connects via Websocket to the tendermint-node to broadcast TXs it received from its connected clients. NodeCommunication acts as a proxy between Tendermint and the Frontend.
 
 The Frontend is connected to the NodeCommunication. It can send Messages to it (which will be relayed as TXs to the node) and can register for receiving messages (which are converted from TXs). 
