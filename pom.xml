@@ -74,8 +74,10 @@
                         </goals>
                         <configuration>
                             <artifactSet>
-                                <excludes>org.bouncycastle:*:*:*</excludes>
-                                <excludes>junit:*:*:*</excludes>
+                            <excludes>
+                                <exclude>org.bouncycastle:*:*:*</exclude>
+                                <exclude>junit:*:*:*</exclude>
+                            </excludes>
                             </artifactSet>
                             <minimizeJar>true</minimizeJar>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
@@ -105,7 +107,7 @@
         <dependency>
             <groupId>com.github.jtendermint</groupId>
             <artifactId>websocket</artifactId>
-            <version>98bef1cf52</version>
+            <version>3580fa495e</version>
         </dependency>
     </dependencies>
 </project>

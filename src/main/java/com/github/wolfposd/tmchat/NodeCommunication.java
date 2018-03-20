@@ -96,9 +96,11 @@ public class NodeCommunication implements ICheckTx, IDeliverTx, ICommit, ISendMe
     private void reconnectWS() {
         System.out.println("Trying to connect to Websocket...");
         try {
+            System.out.println("wsClient.connect()");
             wsClient.connect();
             System.out.println("connected");
         } catch (WebsocketException e) {
+            System.out.println("failed");
             e.printStackTrace();
         }
     }

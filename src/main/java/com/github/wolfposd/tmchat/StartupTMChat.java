@@ -23,11 +23,15 @@
  */
 package com.github.wolfposd.tmchat;
 
+import org.glassfish.tyrus.container.grizzly.client.GrizzlyClientContainer;
+
 import com.github.wolfposd.tmchat.frontend.Frontend;
 
 public class StartupTMChat {
 
     public static void main(String[] args) {
+        // import this here to minify some weird errors, which appear on occasion
+        GrizzlyClientContainer container = new GrizzlyClientContainer();
 
         NodeCommunication nc = new NodeCommunication();
 
