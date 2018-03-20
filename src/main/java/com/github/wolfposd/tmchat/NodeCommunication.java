@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016
+ * Copyright (c) 2016 - 2018 @wolfposd
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,23 +32,23 @@ import java.util.concurrent.TimeUnit;
 import javax.websocket.CloseReason;
 
 import com.github.jtendermint.crypto.ByteUtil;
+import com.github.jtendermint.jabci.api.CodeType;
 import com.github.jtendermint.jabci.api.ICheckTx;
 import com.github.jtendermint.jabci.api.ICommit;
 import com.github.jtendermint.jabci.api.IDeliverTx;
 import com.github.jtendermint.jabci.socket.TSocket;
-import com.github.jtendermint.jabci.types.Types.CodeType;
-import com.github.jtendermint.jabci.types.Types.RequestCheckTx;
-import com.github.jtendermint.jabci.types.Types.RequestCommit;
-import com.github.jtendermint.jabci.types.Types.RequestDeliverTx;
-import com.github.jtendermint.jabci.types.Types.ResponseCheckTx;
-import com.github.jtendermint.jabci.types.Types.ResponseCommit;
-import com.github.jtendermint.jabci.types.Types.ResponseDeliverTx;
-import com.github.jtmsp.websocket.Websocket;
-import com.github.jtmsp.websocket.WebsocketException;
-import com.github.jtmsp.websocket.WebsocketStatus;
-import com.github.jtmsp.websocket.jsonrpc.JSONRPC;
-import com.github.jtmsp.websocket.jsonrpc.Method;
-import com.github.jtmsp.websocket.jsonrpc.calls.StringParam;
+import com.github.jtendermint.jabci.types.RequestCheckTx;
+import com.github.jtendermint.jabci.types.RequestCommit;
+import com.github.jtendermint.jabci.types.RequestDeliverTx;
+import com.github.jtendermint.jabci.types.ResponseCheckTx;
+import com.github.jtendermint.jabci.types.ResponseCommit;
+import com.github.jtendermint.jabci.types.ResponseDeliverTx;
+import com.github.jtendermint.websocket.Websocket;
+import com.github.jtendermint.websocket.WebsocketException;
+import com.github.jtendermint.websocket.WebsocketStatus;
+import com.github.jtendermint.websocket.jsonrpc.JSONRPC;
+import com.github.jtendermint.websocket.jsonrpc.Method;
+import com.github.jtendermint.websocket.jsonrpc.calls.StringParam;
 import com.github.wolfposd.tmchat.frontend.FrontendListener;
 import com.github.wolfposd.tmchat.frontend.ISendMessage;
 import com.google.gson.Gson;
@@ -70,12 +70,27 @@ public class NodeCommunication implements ICheckTx, IDeliverTx, ICommit, ISendMe
         socket = new TSocket();
         socket.registerListener(this);
         new Thread(socket::start).start();
-        System.out.println("Started TMSP Socket");
+        System.out.println("Started ABCI Socket Interface");
 
-        // wait 5 seconds before connecting the websocket
-        System.out.println("waiting 5 seconds before connecting to Websocket...");
+        System.out.println("Now waiting on ABCI-Sockets before connecting to Websocket...");
+        
+        // need atleast 3 socket connections: info,mempool,consensus
+        while(socket.sizeOfConnectedABCISockets() < 3) {
+            sleep(2000);
+            System.out.println("sleeping 2 seconds, to wait for ABCI-connections");
+        }
+        System.out.println("ABCI connections: " + socket.sizeOfConnectedABCISockets());
+        System.out.println("connecting websocket in 5 seconds");
+        
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(() -> reconnectWS(), 5, TimeUnit.SECONDS);
+    }
+
+    private void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+        }
     }
 
     private void reconnectWS() {
@@ -114,7 +129,7 @@ public class NodeCommunication implements ICheckTx, IDeliverTx, ICommit, ISendMe
     @Override
     public ResponseCommit requestCommit(RequestCommit requestCommit) {
         hashCount += 1;
-        return ResponseCommit.newBuilder().setCode(CodeType.OK).setData(ByteString.copyFrom(ByteUtil.toBytes(hashCount))).build();
+        return ResponseCommit.newBuilder().setData(ByteString.copyFrom(ByteUtil.toBytes(hashCount))).build();
     }
 
     @Override
